@@ -1,0 +1,40 @@
+language: go
+go_import_path: github.com/aqilliz/go-zilliqa
+sudo: false
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      sudo: required
+      go: 1.9.x
+      script:
+        - go run build/ci.go install
+        - go run build/ci.go test -coverage $TEST_PACKAGES
+
+    # These are the latest Go versions.
+    - os: linux
+      dist: trusty
+      sudo: required
+      go: 1.10.x
+      script:
+        - go run build/ci.go install
+        - go run build/ci.go test -coverage $TEST_PACKAGES
+
+    - os: osx
+      go: 1.10.x
+      script:
+        - unset -f cd # workaround for https://github.com/travis-ci/travis-ci/issues/8703
+        - brew update
+        - go run build/ci.go install
+        - go run build/ci.go test -coverage $TEST_PACKAGES
+
+    # This builder only tests code linters on latest version of Go
+    - os: linux
+      dist: trusty
+      go: 1.10.x
+      env:
+        - lint
+      git:
+        submodules: false # avoid cloning zilliqa/tests
+      script:
+        - go run build/ci.go lint
